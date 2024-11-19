@@ -1,7 +1,7 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 from .caption_engine import CaptionEngine
+from .utils.img_to_minio import upload_image_to_minio
 
 app = FastAPI()
 
@@ -15,16 +15,10 @@ app.add_middleware(
 
 caption_engine = None
 
-
-class Image(BaseModel):
-    image: bytes
-
-
 @app.on_event("startup")
 async def startup_event():
     global caption_engine
     caption_engine = CaptionEngine()
-
 
 @app.get("/health")
 async def health_check():
@@ -32,12 +26,16 @@ async def health_check():
 
 
 @app.post("/generate-caption")
-async def generate_caption(image: Image) -> dict:
+async def generate_caption(
+    file: UploadFile = File(...), image_id: str = Form(...)
+) -> dict:
     if not caption_engine:
         raise HTTPException(status_code=503, detail="Caption engine not initialized")
 
     try:
-        caption = caption_engine.generate_caption(image.image)
+        image_bytes = await file.read()
+        upload_image_to_minio(image_bytes, image_id)
+        caption = caption_engine.generate_caption(image_bytes)
         return {
             "caption": caption,
         }

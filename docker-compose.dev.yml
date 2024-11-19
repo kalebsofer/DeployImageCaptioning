@@ -1,4 +1,3 @@
-# Define env_file at the top level
 x-env-file: &env-file
   env_file: .env.dev
 
@@ -67,7 +66,7 @@ services:
     <<: *env-file
     environment:
       - ENV=dev
-      - MINIO_URL=minio:9000
+      - MINIO_URL=ic_minio:9000
       - MINIO_SECURE=false
     depends_on:
       ic_minio:
@@ -94,6 +93,7 @@ services:
       - "9001:9001"
     volumes:
       - minio_data:/data
+      - ./ic_nginx/data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
