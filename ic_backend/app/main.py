@@ -1,11 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from .search_engine import SearchEngine
+from .caption_engine import CaptionEngine
 
 app = FastAPI()
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -14,18 +13,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize search engine
-search_engine = None
+caption_engine = None
 
 
-class SearchQuery(BaseModel):
-    query: str
+class Image(BaseModel):
+    image: bytes
 
 
 @app.on_event("startup")
 async def startup_event():
-    global search_engine
-    search_engine = SearchEngine()
+    global caption_engine
+    caption_engine = CaptionEngine()
 
 
 @app.get("/health")
@@ -33,16 +31,15 @@ async def health_check():
     return {"status": "healthy"}
 
 
-@app.post("/search")
-async def search(query: SearchQuery) -> dict:
-    if not search_engine:
-        raise HTTPException(status_code=503, detail="Search engine not initialized")
+@app.post("/generate-caption")
+async def generate_caption(image: Image) -> dict:
+    if not caption_engine:
+        raise HTTPException(status_code=503, detail="Caption engine not initialized")
 
     try:
-        documents, similarities = search_engine.search(query.query)
+        caption = caption_engine.generate_caption(image.image)
         return {
-            "rel_docs": documents,
-            "rel_docs_sim": similarities[0] if similarities else [],
+            "caption": caption,
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

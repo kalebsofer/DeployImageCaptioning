@@ -6,8 +6,7 @@ pandas==2.2.3
 numpy
 nltk
 torch
-faiss-cpu
-gensim
 minio
 python-dotenv
 pyarrow
+torchvision

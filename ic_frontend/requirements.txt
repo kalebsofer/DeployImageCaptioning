@@ -5,6 +5,5 @@ pydantic-settings
 python-dotenv
 torch
 nltk
-gensim
 pytest
 pandas

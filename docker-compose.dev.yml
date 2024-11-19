@@ -3,17 +3,17 @@ x-env-file: &env-file
   env_file: .env.dev
 
 services:
-  nginx:
+  ic_nginx:
     build:
-      context: ./nginx
+      context: ./ic_nginx
       dockerfile: dockerfile
-    image: kalebrs/deploysearch-nginx:latest
+    image: kalebrs/ic-nginx:latest
     <<: *env-file
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
+      - ./ic_nginx/conf.d:/etc/nginx/conf.d
       - letsencrypt:/etc/letsencrypt
       - webroot:/var/www/html
     networks:
@@ -22,33 +22,31 @@ services:
       test: |
         CMD-SHELL
         echo "Testing Frontend connection..." &&
-        curl -f http://frontend:8501/_stcore/health &&
+        curl -f http://ic_frontend:8501/_stcore/health &&
         echo "Testing Backend connection..." &&
-        curl -f http://backend:8051/health ||
+        curl -f http://ic_backend:8051/health ||
         exit 1
       interval: 10s
       timeout: 5s
       retries: 3
       start_period: 30s
     depends_on:
-      frontend:
+      ic_frontend:
         condition: service_healthy
-      backend:
+      ic_backend:
         condition: service_healthy
 
-  frontend:
+  ic_frontend:
     build:
-      context: ./frontend
+      context: ./ic_frontend
       dockerfile: dockerfile
-    image: kalebrs/deploysearch-frontend:latest
+    image: kalebrs/ic-frontend:latest
     <<: *env-file
     environment:
-      - ENV=dev
-      - BACKEND_URL=http://backend:8051
+      - ENV=dev 
+      - BACKEND_URL=http://ic_backend:8051
     depends_on:
-      backend:
-        condition: service_healthy
-      postgres:
+      ic_backend:
         condition: service_healthy
     networks:
       - app-network
@@ -61,6 +59,50 @@ services:
     ports:
       - "8501:8501"
 
+  ic_backend:
+    build:
+      context: ./ic_backend
+      dockerfile: dockerfile
+    image: kalebrs/ic-backend:latest
+    <<: *env-file
+    environment:
+      - ENV=dev
+      - MINIO_URL=minio:9000
+      - MINIO_SECURE=false
+    depends_on:
+      ic_minio:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8051/health"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+    networks:
+      - app-network
+    ports:
+      - "8051:8051"
+
+  ic_minio:
+    build:
+      context: ./ic_minio
+      dockerfile: dockerfile
+    image: kalebrs/ic-minio:latest
+    <<: *env-file
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge
@@ -69,4 +111,3 @@ volumes:
   letsencrypt:
   webroot:
   minio_data:
-  postgres_data:
