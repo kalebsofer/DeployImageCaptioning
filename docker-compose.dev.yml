@@ -2,39 +2,6 @@ x-env-file: &env-file
   env_file: .env.dev
 
 services:
-  ic_nginx:
-    build:
-      context: ./ic_nginx
-      dockerfile: dockerfile
-    image: kalebrs/ic-nginx:latest
-    <<: *env-file
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./ic_nginx/conf.d:/etc/nginx/conf.d
-      - letsencrypt:/etc/letsencrypt
-      - webroot:/var/www/html
-    networks:
-      - app-network
-    healthcheck:
-      test: |
-        CMD-SHELL
-        echo "Testing Frontend connection..." &&
-        curl -f http://ic_frontend:8501/_stcore/health &&
-        echo "Testing Backend connection..." &&
-        curl -f http://ic_backend:8051/health ||
-        exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    depends_on:
-      ic_frontend:
-        condition: service_healthy
-      ic_backend:
-        condition: service_healthy
-
   ic_frontend:
     build:
       context: ./ic_frontend
@@ -42,7 +9,7 @@ services:
     image: kalebrs/ic-frontend:latest
     <<: *env-file
     environment:
-      - ENV=dev 
+      - ENV=dev
       - BACKEND_URL=http://ic_backend:8051
     depends_on:
       ic_backend:
@@ -92,7 +59,6 @@ services:
       - "9000:9000"
       - "9001:9001"
     volumes:
-      - minio_data:/data
       - ./ic_nginx/data:/data
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
@@ -107,7 +73,4 @@ networks:
   app-network:
     driver: bridge
 
-volumes:
-  letsencrypt:
-  webroot:
-  minio_data:
+volumes: {}

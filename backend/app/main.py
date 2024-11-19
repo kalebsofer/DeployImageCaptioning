@@ -25,10 +25,8 @@ async def health_check():
     return {"status": "healthy"}
 
 
-@app.post("/generate-caption")
-async def generate_caption(
-    file: UploadFile = File(...), image_id: str = Form(...)
-) -> dict:
+@app.post("/get-caption")
+async def get_caption(file: UploadFile = File(...), image_id: str = Form(...)) -> dict:
     if not caption_engine:
         raise HTTPException(status_code=503, detail="Caption engine not initialized")
 

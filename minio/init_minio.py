@@ -4,7 +4,7 @@ from pathlib import Path
 
 
 def init_minio():
-    """Initialize MinIO with data bucket and required files."""
+    """Initialize MinIO with data and images buckets and required files."""
 
     client = Minio(
         "localhost:9000",
@@ -20,11 +20,16 @@ def init_minio():
     except Exception as e:
         print(f"Error creating bucket data: {e}")
 
+    try:
+        if not client.bucket_exists("images"):
+            print("Creating bucket: images")
+            client.make_bucket("images")
+    except Exception as e:
+        print(f"Error creating bucket images: {e}")
+
     files_to_upload = [
-        "word-vector-embeddings.model",
-        "training-with-tokens.parquet",
-        "doc-index-64.faiss",
-        "two_tower_state_dict.pth",
+        "tokenizer.model",
+        "transformer_latest.pth",
     ]
 
     for file in files_to_upload:

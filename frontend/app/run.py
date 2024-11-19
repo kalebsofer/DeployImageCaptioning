@@ -1,8 +1,7 @@
 import os
+import uvicorn
 
 os.environ["KMP_DUPLICATE_LIB_OK"] = "TRUE"
-
-import uvicorn
 
 if __name__ == "__main__":
     uvicorn.run(
