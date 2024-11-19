@@ -1,0 +1,11 @@
+numpy
+torch
+pandas
+tqdm
+wandb
+torchvision
+nltk
+string
+sentencepiece
+matplotlib
+

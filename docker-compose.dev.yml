@@ -1,0 +1,72 @@
+# Define env_file at the top level
+x-env-file: &env-file
+  env_file: .env.dev
+
+services:
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: dockerfile
+    image: kalebrs/deploysearch-nginx:latest
+    <<: *env-file
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/conf.d:/etc/nginx/conf.d
+      - letsencrypt:/etc/letsencrypt
+      - webroot:/var/www/html
+    networks:
+      - app-network
+    healthcheck:
+      test: |
+        CMD-SHELL
+        echo "Testing Frontend connection..." &&
+        curl -f http://frontend:8501/_stcore/health &&
+        echo "Testing Backend connection..." &&
+        curl -f http://backend:8051/health ||
+        exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: dockerfile
+    image: kalebrs/deploysearch-frontend:latest
+    <<: *env-file
+    environment:
+      - ENV=dev
+      - BACKEND_URL=http://backend:8051
+    depends_on:
+      backend:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -v http://localhost:8501/_stcore/health || echo 'Health check failed' >&2"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+      - "8501:8501"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  letsencrypt:
+  webroot:
+  minio_data:
+  postgres_data:
