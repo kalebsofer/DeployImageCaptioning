@@ -3,7 +3,7 @@ import torch
 from PIL import Image
 from minio import Minio
 
-from config.settings import get_settings
+from .config.settings import get_settings
 from .utils.preproc_img import preprocess_image
 from .models.transformer import Transformer
 from .models.params import params
