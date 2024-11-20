@@ -44,11 +44,10 @@ class CaptionEngine:
         #     torch.load(io.BytesIO(model_data), map_location=torch.device("cpu"))
         # )
         # self.model.eval()
-
         # tokeniser_data = self._get_file_from_minio("data", "tokenizer.model")
         # self.tokeniser = self._load_tokeniser(io.BytesIO(tokeniser_data))
 
-    def generate_caption(self, image_bytes: bytes) -> str:
+    def get_caption(self, image_bytes: bytes) -> str:
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         image_tensor = preprocess_image(image)
 

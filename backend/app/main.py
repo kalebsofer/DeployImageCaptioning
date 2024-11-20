@@ -25,15 +25,17 @@ async def health_check():
     return {"status": "healthy"}
 
 
-@app.post("/get-caption")
-async def get_caption(file: UploadFile = File(...), image_id: str = Form(...)) -> dict:
+@app.post("/generate-caption")
+async def generate_caption(
+    file: UploadFile = File(...), image_id: str = Form(...)
+) -> dict:
     if not caption_engine:
         raise HTTPException(status_code=503, detail="Caption engine not initialized")
 
     try:
         image_bytes = await file.read()
         upload_image_to_minio(image_bytes, image_id)
-        caption = caption_engine.generate_caption(image_bytes)
+        caption = caption_engine.get_caption(image_bytes)
         return {
             "caption": caption,
         }
