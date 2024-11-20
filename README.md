@@ -4,7 +4,25 @@
 
 ![container architecture](./public/images/container_architecture.png)
 
-## Prerequisites
+
+## Local development
+- Create .env.prod file (see discord for details) in project root
+- Build docker images
+```bash
+docker-compose --env-file .env.prod -f docker-compose.prod.yml build
+```
+- run containers
+```bash
+docker-compose --env-file .env.prod -f docker-compose.prod.yml up -d
+```
+- If that works, merge to main and we'll deploy to prod
+
+- To stop containers
+```bash
+docker-compose --env-file .env.prod -f docker-compose.prod.yml down
+```
+
+## Deployment Prerequisites
 
 - **Remote Server**: Ensure you have a remote server set up.
 - **Project Folder**: Create a project folder on your remote server.
