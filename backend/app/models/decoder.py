@@ -5,7 +5,7 @@ from torchtune.modules import RotaryPositionalEmbeddings
 from .tokeniser import GPT2TokeniserPlus
 
 
-class FrankensteinCaption(nn.Module):
+class FrankDecoder(nn.Module):
     def __init__(
         self,
         *,
