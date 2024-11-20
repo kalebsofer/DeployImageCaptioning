@@ -42,10 +42,10 @@ class CaptionEngine:
 
         # TODO finish once model is trained
 
-        # self.model.load_state_dict(
-        #     torch.load(io.BytesIO(model_data), map_location=torch.device("cpu"))
-        # )
-        # self.model.eval()
+        self.model.load_state_dict(
+            torch.load(io.BytesIO(model_data), map_location=torch.device("cpu"))
+        )
+        self.model.eval()
         # tokeniser_data = self._get_file_from_minio("data", "tokenizer.model")
         self.tokeniser = GPT2TokeniserPlus()
 

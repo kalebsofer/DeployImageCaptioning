@@ -10,4 +10,8 @@ minio
 python-dotenv
 pyarrow
 torchvision
+torchtune
+torchao
 python-multipart
+matplotlib
+transformers

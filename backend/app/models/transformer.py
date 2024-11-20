@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 
-import tapped_vit_b_16
+from .tapped_vit_b_16 import ImageEncoder
 
 from .decoder import FrankDecoder
 
@@ -10,7 +10,7 @@ class Transformer(nn.Module):
     def __init__(self, *, decoder_params):
         super().__init__()
 
-        self.encoder = tapped_vit_b_16.ImageEncoder()
+        self.encoder = ImageEncoder()
 
         self.decoder = FrankDecoder(**decoder_params)
 

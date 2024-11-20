@@ -36,6 +36,8 @@ if uploaded_image is not None and not st.session_state.image_uploaded:
     session_id = log_manager.get_or_create_session_id()
 
     if st.button("Submit"):
+        st.session_state.caption = 'AAAA'
+        reset_state()
         try:
             files = {"file": uploaded_image.getvalue()}
             data = {"image_id": image_id}
