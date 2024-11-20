@@ -6,7 +6,9 @@ from minio import Minio
 from .config.settings import get_settings
 from .utils.preproc_img import preprocess_image
 from .models.transformer import Transformer
-from .models.params import params
+from .models.tokeniser import GPT2TokeniserPlus
+from .models.generate import CaptionGenerator
+from .models.params import decoder_params
 
 settings = get_settings()
 
@@ -36,7 +38,7 @@ class CaptionEngine:
     def _initialize_resources(self):
         model_data = self._get_file_from_minio("data", "transformer_latest.pth")
 
-        self.model = Transformer(params["learning_rate"], params["batch_size"])
+        self.model = Transformer(decoder_params=decoder_params)
 
         # TODO finish once model is trained
 
@@ -45,18 +47,22 @@ class CaptionEngine:
         # )
         # self.model.eval()
         # tokeniser_data = self._get_file_from_minio("data", "tokenizer.model")
-        # self.tokeniser = self._load_tokeniser(io.BytesIO(tokeniser_data))
+        self.tokeniser = GPT2TokeniserPlus()
+
+        self.generator = CaptionGenerator(model=self.model, tokeniser=self.tokeniser)
 
     def get_caption(self, image_bytes: bytes) -> str:
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-        image_tensor = preprocess_image(image)
+        # image_tensor = preprocess_image(image)
 
-        # Run image through model to get caption embedding
-        with torch.no_grad():
-            caption_embedding = self.model(image_tensor)
+        # # Run image through model to get caption embedding
+        # with torch.no_grad():
+        #     caption_embedding = self.model(image_tensor)
 
         # Decode caption embedding using the tokeniser
         # caption = self.tokeniser.decode(caption_embedding)
-        caption = "Generated caption"
+
+        # You should be able to send PIL Images directly to generator
+        _, caption = self.generator.generate(image)
 
         return caption
