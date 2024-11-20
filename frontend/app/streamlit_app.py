@@ -41,7 +41,7 @@ if uploaded_image is not None:
             st.subheader("Generated Caption:")
             st.write(caption)
 
-            log_manager.log_search(
+            log_manager.log_caption(
                 image_id=image_id,
                 generated_caption=caption,
                 feedback_received=False,
@@ -54,7 +54,7 @@ if uploaded_image is not None:
             user_caption = st.text_input("Please provide accurate caption")
 
             if st.button("Submit Feedback"):
-                log_manager.log_search(
+                log_manager.log_caption(
                     image_id=image_id,
                     generated_caption=caption,
                     feedback_received=True,

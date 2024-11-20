@@ -9,14 +9,14 @@ settings = get_settings()
 
 
 @dataclass
-class SearchLog:
+class CaptionLog:
     user_id: str
     session_id: str
     image_id: str
     generated_caption: str
-    feedback_received: bool = False
     rating: int
     ideal_caption: str
+    feedback_received: bool = False
     created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
 
 
@@ -45,13 +45,22 @@ class LogManager:
             st.session_state.session_id = str(uuid.uuid4())
         return st.session_state.session_id
 
-    def log_search(self, query: str, selected_document: str, similarity_score: float):
-        log = SearchLog(
+    def log_caption(
+        self,
+        image_id: str,
+        generated_caption: str,
+        feedback_received: bool,
+        rating: int,
+        ideal_caption: str,
+    ):
+        log = CaptionLog(
             user_id=self.get_or_create_user_id(),
             session_id=self.get_or_create_session_id(),
-            query=query,
-            selected_document=selected_document,
-            similarity_score=similarity_score,
+            image_id=image_id,
+            generated_caption=generated_caption,
+            feedback_received=feedback_received,
+            rating=rating,
+            ideal_caption=ideal_caption,
             created_at=datetime.now(timezone.utc),
         )
 
@@ -84,19 +93,19 @@ class LogManager:
             with conn.cursor() as cur:
                 cur.execute(
                     """
-                    UPDATE search_logs 
+                    UPDATE caption_logs 
                     SET feedback_received = TRUE 
                     WHERE user_id = %s
                     AND session_id = %s
-                    AND query = %s 
-                    AND selected_document = %s 
+                    AND image_id = %s 
+                    AND generated_caption = %s 
                     AND created_at = (
                         SELECT created_at 
-                        FROM search_logs 
+                        FROM caption_logs 
                         WHERE user_id = %s 
                         AND session_id = %s 
-                        AND query = %s 
-                        AND selected_document = %s 
+                        AND image_id = %s 
+                        AND generated_caption = %s 
                         ORDER BY created_at DESC 
                         LIMIT 1
                     )

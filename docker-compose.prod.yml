@@ -1,37 +1,35 @@
 services:
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    image: kalebrs/imagecaption-nginx:latest
-    env_file:
-      - .env.prod
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d
-      - letsencrypt:/etc/letsencrypt
-      - webroot:/var/www/html
-    networks:
-      - app-network
-    healthcheck:
-      test: |
-        CMD-SHELL
-        echo "Testing Frontend connection..." &&
-        curl -f http://ic_frontend:8501/_stcore/health &&
-        echo "Testing Backend connection..." &&
-        curl -f http://ic_backend:8051/health ||
-        exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    depends_on:
-      frontend:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
+  # nginx:
+  #   build:
+  #     context: ./nginx
+  #     dockerfile: Dockerfile
+  #   image: kalebrs/imagecaption-nginx:latest
+  #   env_file:
+  #     - .env.prod
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"
+  #   volumes:
+  #     - ./image_caption/nginx/conf.d:/etc/nginx/conf.d
+  #   networks:
+  #     - app-network
+  #   healthcheck:
+  #     test: |
+  #       CMD-SHELL
+  #       echo "Testing Frontend connection..." &&
+  #       curl -f http://ic_frontend:8501/_stcore/health &&
+  #       echo "Testing Backend connection..." &&
+  #       curl -f http://ic_backend:8051/health ||
+  #       exit 1
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 3
+  #     start_period: 30s
+  #   depends_on:
+  #     frontend:
+  #       condition: service_healthy
+  #     backend:
+  #       condition: service_healthy
 
   frontend:
     build:
@@ -137,6 +135,8 @@ services:
     networks:
       - app-network
     restart: unless-stopped
+    volumes:
+       - pgadmin_data:/var/lib/pgadmin
 
 networks:
   app-network:
@@ -146,4 +146,8 @@ volumes:
   letsencrypt:
   webroot:
   minio_data:
+    driver: local
   postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local

@@ -27,22 +27,26 @@ class CaptionEngine:
     def _get_file_from_minio(self, bucket: str, object_name: str) -> bytes:
         try:
             response = self.minio_client.get_object(bucket, object_name)
-            return response.read()
+            data = response.read()
+            print(f"Retrieved {object_name} of size {len(data)} bytes")
+            return data
         except Exception as e:
             raise Exception(f"Error loading {object_name} from MinIO: {str(e)}")
 
     def _initialize_resources(self):
-        model_data = self._get_file_from_minio("models", "model_latest.pth")
+        model_data = self._get_file_from_minio("data", "transformer_latest.pth")
 
-        self.model = Transformer(params)
+        self.model = Transformer(params["learning_rate"], params["batch_size"])
 
-        self.model.load_state_dict(
-            torch.load(io.BytesIO(model_data), map_location=torch.device("cpu"))
-        )
-        self.model.eval()
+        # TODO finish once model is trained
 
-        tokeniser_data = self._get_file_from_minio("models", "tokeniser.model")
-        self.tokeniser = self._load_tokeniser(io.BytesIO(tokeniser_data))
+        # self.model.load_state_dict(
+        #     torch.load(io.BytesIO(model_data), map_location=torch.device("cpu"))
+        # )
+        # self.model.eval()
+
+        # tokeniser_data = self._get_file_from_minio("data", "tokenizer.model")
+        # self.tokeniser = self._load_tokeniser(io.BytesIO(tokeniser_data))
 
     def generate_caption(self, image_bytes: bytes) -> str:
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
