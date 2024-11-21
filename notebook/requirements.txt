@@ -6,3 +6,4 @@ evaluate
 matplotlib
 PIL
 io
+pycocoevalcap
