@@ -51,7 +51,7 @@ class CaptionEngine:
 
         self.generator = CaptionGenerator(model=self.model, tokeniser=self.tokeniser)
 
-    def get_caption(self, image_bytes: bytes) -> str:
+    def get_caption(self, image_bytes: bytes, temperature) -> str:
         image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
         # image_tensor = preprocess_image(image)
 
@@ -63,6 +63,6 @@ class CaptionEngine:
         # caption = self.tokeniser.decode(caption_embedding)
 
         # You should be able to send PIL Images directly to generator
-        _, caption = self.generator.generate(image)
+        _, caption = self.generator.generate(image, temperature=temperature)
 
         return caption

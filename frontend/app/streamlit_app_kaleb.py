@@ -38,7 +38,7 @@ if uploaded_image is not None and not st.session_state.image_uploaded:
     if st.button("Submit"):
         try:
             files = {"file": uploaded_image.getvalue()}
-            data = {"image_id": image_id}
+            data = {"image_id": image_id, "temperature": 1.0}
             response = requests.post(
                 f"{settings.BACKEND_URL}/generate-caption",
                 files=files,

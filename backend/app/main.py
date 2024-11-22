@@ -34,18 +34,15 @@ async def foo():
 
 @app.post("/generate-caption")
 async def generate_caption(
-    file: UploadFile = File(...), image_id: str = Form(...)
+    file: UploadFile = File(...), image_id: str = Form(...), temperature: float = Form(1.0)
 ) -> dict:
-    # return {
-    #     "caption": "asdf",
-    # }
     if not caption_engine:
         raise HTTPException(status_code=503, detail="Caption engine not initialized")
 
     try:
         image_bytes = await file.read()
         upload_image_to_minio(image_bytes, image_id)
-        caption = caption_engine.get_caption(image_bytes)
+        caption = caption_engine.get_caption(image_bytes, temperature=temperature)
         return {
             "caption": caption,
         }
