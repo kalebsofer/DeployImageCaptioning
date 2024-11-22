@@ -15,20 +15,30 @@ app.add_middleware(
 
 caption_engine = None
 
+
 @app.on_event("startup")
 async def startup_event():
     global caption_engine
     caption_engine = CaptionEngine()
+
 
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
 
 
+@app.post("/foo")
+async def foo():
+    return {"message": "foo"}
+
+
 @app.post("/generate-caption")
 async def generate_caption(
     file: UploadFile = File(...), image_id: str = Form(...)
 ) -> dict:
+    # return {
+    #     "caption": "asdf",
+    # }
     if not caption_engine:
         raise HTTPException(status_code=503, detail="Caption engine not initialized")
 
