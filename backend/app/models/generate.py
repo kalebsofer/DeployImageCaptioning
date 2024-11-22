@@ -14,7 +14,8 @@ class CaptionGenerator:
         tokeniser,
         default_max_length: int = 50,
         default_temp: float = 1.0,
-        # default_rep_penalty: float = 1.0,
+        default_rep_penalty: float = 1.0,
+        default_top_k: int = 50,
     ) -> None:
         self.model = model
         self.img_to_tensor = (
@@ -23,7 +24,8 @@ class CaptionGenerator:
         self.tokeniser = tokeniser
         self.default_max_length = default_max_length
         self.default_temp = default_temp
-        # self.defaultrep_penalty = defaultrep_penalty
+        self.default_rep_penalty = default_rep_penalty
+        self.default_top_k = default_top_k
 
     def generate(
         self,
@@ -31,7 +33,8 @@ class CaptionGenerator:
         *,
         max_length=None,
         temperature=None,
-        # repetition_penalty=None,
+        repetition_penalty=None,
+        top_k=None,
     ):
         if isinstance(image, Image):
             image = self.img_to_tensor(image).unsqueeze(0).to(device)
@@ -39,8 +42,10 @@ class CaptionGenerator:
             max_length = self.default_max_length
         if temperature is None:
             temperature = self.default_temp
-        # if repetition_penalty is None:
-        #     repetition_penalty = self.defaultrep_penalty
+        if repetition_penalty is None:
+            repetition_penalty = self.default_rep_penalty
+        if top_k is None:
+            top_k = self.default_top_k
 
         # Start with BOS token
         current_tokens = torch.tensor([[self.tokeniser.bos_id]], device=device)
@@ -56,18 +61,17 @@ class CaptionGenerator:
             next_token_logits = next_token_logits / temperature
 
             # TODO Apply repetition penalty
-            # if repetition_penalty != 1.0:
-            #     for token in set(current_tokens[0].tolist()):
-            #         next_token_logits[0, token] /= repetition_penalty
+            if repetition_penalty != 1.0:
+                for token in set(current_tokens[0].tolist()):
+                    next_token_logits[0, token] /= repetition_penalty
+
+            top_k_logits, top_k_indices = torch.topk(next_token_logits, top_k, dim=-1)
 
             # Convert logits to probabilities
-            probs = F.softmax(next_token_logits, dim=-1)
+            probs = F.softmax(top_k_logits, dim=-1)
 
             # Sample next token
-            next_token = torch.multinomial(probs, num_samples=1)
-
-            # just argmax
-            # next_token = torch.argmax(probs).unsqueeze(0).unsqueeze(0)
+            next_token = top_k_indices[0, torch.multinomial(probs, num_samples=1)]
 
             # Append next token to sequence
             current_tokens = torch.cat([current_tokens, next_token], dim=1)
