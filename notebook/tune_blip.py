@@ -217,7 +217,7 @@ def evaluate_model(test_dataset, model, processor, id_to_caption):
     generated_captions = []
     reference_captions = []
 
-    for example in random.sample(list(test_dataset), 2):
+    for example in random.sample(list(test_dataset), 10):
         pixel_values = example["pixel_values"]
 
         display_image_with_captions(np.array(pixel_values), "", "")

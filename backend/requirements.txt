@@ -11,3 +11,4 @@ python-dotenv
 pyarrow
 torchvision
 python-multipart
+transformers
