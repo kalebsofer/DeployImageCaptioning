@@ -18,4 +18,4 @@ for image in "${images[@]}"; do
   docker push "$DOCKER_HUB_USERNAME/$image:latest"
 done
 
-# open bash terminal, ./push_images.sh
+# open bash, run ./push_images.sh
