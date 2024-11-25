@@ -47,3 +47,5 @@ doc-index-64.faiss
 
 .env*
 !.env.example
+wandb/
+minio/model/

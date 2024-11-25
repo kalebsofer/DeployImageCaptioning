@@ -8,17 +8,17 @@ def init_minio():
 
     client = Minio(
         "localhost:9000",
-        access_key=os.getenv("MINIO_ACCESS_KEY", "minioadmin"),
-        secret_key=os.getenv("MINIO_SECRET_KEY", "minioadmin"),
+        access_key=os.getenv("MINIO_ROOT_USER", "minioadmin"),
+        secret_key=os.getenv("MINIO_ROOT_PASSWORD", "minioadmin"),
         secure=os.getenv("MINIO_SECURE", "false").lower() == "true",
     )
 
     try:
-        if not client.bucket_exists("data"):
-            print("Creating bucket: data")
-            client.make_bucket("data")
+        if not client.bucket_exists("model"):
+            print("Creating bucket: model")
+            client.make_bucket("model")
     except Exception as e:
-        print(f"Error creating bucket data: {e}")
+        print(f"Error creating bucket model: {e}")
 
     try:
         if not client.bucket_exists("images"):
@@ -27,26 +27,20 @@ def init_minio():
     except Exception as e:
         print(f"Error creating bucket images: {e}")
 
-    files_to_upload = [
-        "tokenizer.model",
-        "transformer_latest.pth",
-    ]
-
-    for file in files_to_upload:
-        source_path = Path("/data") / file
-        try:
-            client.stat_object("data", file)
-            print(f"File {file} already exists in bucket")
-        except:
-            if source_path.exists():
+    model_dir = Path("/model")
+    for file_path in model_dir.glob("*"):
+        if file_path.is_file():
+            file_name = file_path.name
+            try:
+                client.stat_object("model", file_name)
+                print(f"File {file_name} already exists in bucket")
+            except:
                 try:
-                    print(f"Uploading {file} to bucket")
-                    client.fput_object("data", file, str(source_path))
-                    print(f"Successfully uploaded {file}")
+                    print(f"Uploading {file_name} to bucket")
+                    client.fput_object("model", file_name, str(file_path))
+                    print(f"Successfully uploaded {file_name}")
                 except Exception as e:
-                    print(f"Error uploading {file}: {e}")
-            else:
-                print(f"Warning: Source file not found: {source_path}")
+                    print(f"Error uploading {file_name}: {e}")
 
 
 if __name__ == "__main__":

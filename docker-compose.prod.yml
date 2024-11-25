@@ -1,35 +1,37 @@
 services:
-  # nginx:
-  #   build:
-  #     context: ./nginx
-  #     dockerfile: Dockerfile
-  #   image: kalebrs/imagecaption-nginx:latest
-  #   env_file:
-  #     - .env.prod
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./image_caption/nginx/conf.d:/etc/nginx/conf.d
-  #   networks:
-  #     - app-network
-  #   healthcheck:
-  #     test: |
-  #       CMD-SHELL
-  #       echo "Testing Frontend connection..." &&
-  #       curl -f http://ic_frontend:8501/_stcore/health &&
-  #       echo "Testing Backend connection..." &&
-  #       curl -f http://ic_backend:8051/health ||
-  #       exit 1
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 30s
-  #   depends_on:
-  #     frontend:
-  #       condition: service_healthy
-  #     backend:
-  #       condition: service_healthy
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    image: kalebrs/imagecaption-nginx:latest
+    env_file:
+      - .env.prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./image_caption/nginx/conf.d:/etc/nginx/conf.d
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    networks:
+      - app-network
+    healthcheck:
+      test: |
+        CMD-SHELL
+        echo "Testing Frontend connection..." &&
+        curl -f http://ic_frontend:8501/_stcore/health &&
+        echo "Testing Backend connection..." &&
+        curl -f http://ic_backend:8051/health ||
+        exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    depends_on:
+      frontend:
+        condition: service_healthy
+      backend:
+        condition: service_healthy
+
 
   frontend:
     build:

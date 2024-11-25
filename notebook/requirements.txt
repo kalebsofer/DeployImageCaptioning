@@ -1,0 +1,9 @@
+torch
+transformers
+datasets
+wandb
+evaluate
+matplotlib
+PIL
+io
+pycocoevalcap

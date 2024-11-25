@@ -8,3 +8,6 @@ nltk
 string
 sentencepiece
 matplotlib
+datasets
+transformers
+PIL

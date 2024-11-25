@@ -1,33 +1,17 @@
 FROM nginx:alpine
 
-# Install certbot and dependencies
-RUN apk add --no-cache \
-    certbot \
-    certbot-nginx \
-    openssl \
-    iputils \
-    bind-tools \
-    netcat-openbsd \
-    dos2unix
+RUN apk add --no-cache certbot openssl
 
-# Remove default config and create required directories
-RUN rm -f /etc/nginx/conf.d/default.conf
-RUN mkdir -p /var/www/html
-RUN mkdir -p /etc/letsencrypt
-RUN mkdir -p /etc/nginx/conf.d
+RUN rm -f /etc/nginx/conf.d/default.conf && \
+    mkdir -p /var/www/html && \
+    mkdir -p /etc/letsencrypt
 
-# Copy nginx config and SSL setup script
-COPY conf.d/* /etc/nginx/conf.d/
+COPY conf.d/default.conf /etc/nginx/conf.d/default.conf
+
 COPY setup-ssl.sh /setup-ssl.sh
 
-# Make script executable and ensure proper line endings
-RUN chmod +x /setup-ssl.sh && \
-    dos2unix /setup-ssl.sh 2>/dev/null || true && \
-    ls -la /setup-ssl.sh  # Verify permissions
+RUN chmod +x /setup-ssl.sh
 
 EXPOSE 80 443
-
-# Copy the initial config to a backup location
-RUN cp /etc/nginx/conf.d/default.conf /etc/nginx/conf.d/default.conf.orig
 
 ENTRYPOINT ["/setup-ssl.sh"]

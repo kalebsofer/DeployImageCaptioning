@@ -10,8 +10,8 @@ def upload_image_to_minio(image_bytes: bytes, image_id: str) -> None:
     try:
         minio_client = Minio(
             settings.MINIO_URL,
-            access_key=settings.MINIO_ACCESS_KEY,
-            secret_key=settings.MINIO_SECRET_KEY,
+            access_key=settings.MINIO_ROOT_USER,
+            secret_key=settings.MINIO_ROOT_PASSWORD,
             secure=settings.MINIO_SECURE,
         )
         minio_client.put_object(
