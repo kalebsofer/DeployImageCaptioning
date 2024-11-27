@@ -24,7 +24,12 @@ services:
       retries: 5
       start_period: 30s
     labels:
-      - "traefik.http.routers.img.rule=Host(`img.sulaiman-ov.com`)"
+      - "traefik.enable=true"
+      - "traefik.http.routers.image.rule=Host(`image.sulaiman-ov.com`)"
+      - "traefik.http.routers.image.entrypoints=websecure"
+      - "traefik.http.routers.image.tls.certresolver=letsencrypt"
+    ports:
+      - "8501:80"
 
   backend:
     build:
@@ -44,8 +49,6 @@ services:
       start_period: 60s
     networks:
       - app-network
-    # ports:
-    #   - "8051:8051"
 
   postgres:
     build:
@@ -64,8 +67,6 @@ services:
       start_period: 10s
     networks:
       - app-network
-    # ports:
-    #   - "5432:5432"
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -89,7 +90,6 @@ networks:
     external: true
 
 volumes:
-  letsencrypt:
   webroot:
   postgres_data:
     driver: local
