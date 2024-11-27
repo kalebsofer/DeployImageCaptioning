@@ -6,8 +6,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN pip install psycopg2-binary
 
+EXPOSE 80
+
 COPY app/ app/
 
 ENV PYTHONPATH=/app
 
-CMD ["streamlit", "run", "app/streamlit_app.py"]
+CMD ["streamlit", "run", "app/streamlit_app.py", "--server.port", "80"]

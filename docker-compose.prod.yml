@@ -1,36 +1,4 @@
 services:
-  # nginx:
-  #   build:
-  #     context: ./nginx
-  #     dockerfile: Dockerfile
-  #   image: kalebrs/imagecaption-nginx:latest
-  #   env_file:
-  #     - .env.prod
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
-  #   volumes:
-  #     - ./image_caption/nginx/conf.d:/etc/nginx/conf.d
-  #   networks:
-  #     - app-network
-  #   healthcheck:
-  #     test: |
-  #       CMD-SHELL
-  #       echo "Testing Frontend connection..." &&
-  #       curl -f http://ic_frontend:8501/_stcore/health &&
-  #       echo "Testing Backend connection..." &&
-  #       curl -f http://ic_backend:8051/health ||
-  #       exit 1
-  #     interval: 10s
-  #     timeout: 5s
-  #     retries: 3
-  #     start_period: 30s
-  #   depends_on:
-  #     frontend:
-  #       condition: service_healthy
-  #     backend:
-  #       condition: service_healthy
-
   frontend:
     build:
       context: ./frontend
@@ -48,14 +16,15 @@ services:
         condition: service_healthy
     networks:
       - app-network
+      - traefik_default
     healthcheck:
       test: [ "CMD-SHELL", "curl -v http://localhost:8501/_stcore/health || echo 'Health check failed' >&2" ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
-    ports:
-      - "8501:8501"
+    labels:
+      - "traefik.http.routers.img.rule=Host(`img.sulaiman-ov.com`)"
 
   backend:
     build:
@@ -66,7 +35,6 @@ services:
       - .env.prod
     environment:
       - ENV=prod
-      # - MINIO_URL=http://sulaiman-ov.com:9000
       - MINIO_SECURE=false
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8051/health" ]
@@ -76,29 +44,8 @@ services:
       start_period: 60s
     networks:
       - app-network
-    ports:
-      - "8051:8051"
-
-  # minio:
-  #   build:
-  #     context: ./minio
-  #     dockerfile: Dockerfile
-  #   image: kalebrs/imagecaption-minio:latest
-  #   env_file:
-  #     - .env.prod
-  #   ports:
-  #     - "9000:9000"
-  #     - "9001:9001"
-  #   volumes:
-  #     - minio_data:/data
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 10s
-  #   networks:
-  #     - app-network
+    # ports:
+    #   - "8051:8051"
 
   postgres:
     build:
@@ -117,8 +64,8 @@ services:
       start_period: 10s
     networks:
       - app-network
-    ports:
-      - "5432:5432"
+    # ports:
+    #   - "5432:5432"
 
   pgadmin:
     image: dpage/pgadmin4:latest
@@ -138,12 +85,12 @@ services:
 networks:
   app-network:
     driver: bridge
+  traefik_default:
+    external: true
 
 volumes:
   letsencrypt:
   webroot:
-  minio_data:
-    driver: local
   postgres_data:
     driver: local
   pgadmin_data:
