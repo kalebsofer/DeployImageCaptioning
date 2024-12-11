@@ -1,13 +1,50 @@
 # DeployImageCaptioning
 
-### Container Architecture:
+[Frontend lives here](http://37.27.222.64:8501/)
 
-![container architecture](./public/images/container_architecture.png)
+
+## Overview
+
+<div style="display: flex; align-items: center;">
+
+  <div style="flex: 1; padding: 10px;">
+    <p>
+      DeployImageCaptioning is the deployment of <a href="https://github.com/kalebsofer/ImageCaptioning" target="_blank">ImageCaptioning</a>, a multi-modal transformer for image captioning. The project is fully containerized, scalable, and modularised. It is deployed on a renter Hetzner server.
+    </p>
+    <p>
+    The transformer architecture follows a similar design the <a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention is All You Need</a> paper.
+    </p>
+  </div>
+
+  <div style="flex: 1; padding: 10px;">
+    <img src="public/images/transformer.png" alt="transformer" width="100%"/>
+  </div>
+
+</div>
+
+## Container Architecture
+
+The architecture is modular and scalable. Docker containers have a single purpose and are designed to be stateless.
+
+- **Frontend**: Hosted using a Streamlit server, accessible at [http://65.109.142.90:8501/](http://65.109.142.90:8501/).
+- **Backend**: Retrieves the model and performs inference on incoming audio transcription requests.
+- **Storage**: MinIO is used to store different versions of the transcription model.
+- **RDBS**: PostgreSQL is utilized to log user behavior and interactions.
+- **Traffic**: Nginx is configured to handle traffic and SSL termination.
+- **Reinforcement**: Spins up on a schedule, uses PostgreSQL logs for reinforcement, updates the model weights, and pushes the latest version to MinIO.
+
+![Container Architecture](public/images/container_architecture.png)
+
+## Stack
+
+
+
+![Stack](public/images/stack.png)
 
 
 ## Local development
-- Create .env.prod file (see discord for details) in project root
-- Build docker images
+- update .env.prod in project root
+- Build images
 ```bash
 docker-compose --env-file .env.prod -f docker-compose.prod.yml build
 ```
@@ -15,7 +52,7 @@ docker-compose --env-file .env.prod -f docker-compose.prod.yml build
 ```bash
 docker-compose --env-file .env.prod -f docker-compose.prod.yml up -d
 ```
-- If that works, merge to main and we'll deploy to prod
+- Merge to main for prod deploy
 
 - To stop containers
 ```bash
