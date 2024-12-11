@@ -1,25 +1,16 @@
 # DeployImageCaptioning
 
-[Frontend lives here](http://37.27.222.64:8501/)
-
+[Frontend lives here 🌐](http://37.27.222.64:8501/)
 
 ## Overview
 
-<div style="display: flex; align-items: center;">
+DeployImageCaptioning is the deployment of [ImageCaptioning](https://github.com/kalebsofer/ImageCaptioning), a multi-modal transformer for image captioning. The project is fully containerized, scalable, and modularised. It is deployed on a renter Hetzner server.
 
-  <div style="flex: 1; padding: 10px;">
-    <p>
-      DeployImageCaptioning is the deployment of <a href="https://github.com/kalebsofer/ImageCaptioning" target="_blank">ImageCaptioning</a>, a multi-modal transformer for image captioning. The project is fully containerized, scalable, and modularised. It is deployed on a renter Hetzner server.
-    </p>
-    <p>
-    The transformer architecture follows a similar design the <a href="https://arxiv.org/abs/1706.03762" target="_blank">Attention is All You Need</a> paper.
-    </p>
-  </div>
+The transformer architecture follows a similar design to the [Attention is All You Need](https://arxiv.org/abs/1706.03762) paper.
 
-  <div style="flex: 1; padding: 10px;">
-    <img src="public/images/transformer.png" alt="transformer" width="100%"/>
-  </div>
-
+<div align="center">
+  <img src="public/images/transformer.png" alt="transformer" width="50%"/>
+  <p><em>Transformer Architecture</em></p>
 </div>
 
 ## Container Architecture
@@ -37,35 +28,32 @@ The architecture is modular and scalable. Docker containers have a single purpos
 
 ## Stack
 
-
-
 ![Stack](public/images/stack.png)
 
+## Local Development
 
-## Local development
-- update .env.prod in project root
-- Build images
-```bash
-docker-compose --env-file .env.prod -f docker-compose.prod.yml build
-```
-- run containers
-```bash
-docker-compose --env-file .env.prod -f docker-compose.prod.yml up -d
-```
+- Update `.env.prod` in project root
+- Build images:
+  ```bash
+  docker-compose --env-file .env.prod -f docker-compose.prod.yml build
+  ```
+- Run containers:
+  ```bash
+  docker-compose --env-file .env.prod -f docker-compose.prod.yml up -d
+  ```
 - Merge to main for prod deploy
-
-- To stop containers
-```bash
-docker-compose --env-file .env.prod -f docker-compose.prod.yml down
-```
+- To stop containers:
+  ```bash
+  docker-compose --env-file .env.prod -f docker-compose.prod.yml down
+  ```
 
 ## Deployment Prerequisites
 
-- **Remote Server**: Ensure you have a remote server set up.
-- **Project Folder**: Create a project folder on your remote server.
-- **Docker Installed**: Install Docker on your remote server.
-- **Domain Name**: Associate your domain name with your remote server's IP address.
-- **SSL Certificate**: Obtain an SSL certificate for your domain.
+- [ ] **Remote Server**: Ensure you have a remote server set up.
+- [ ] **Project Folder**: Create a project folder on your remote server.
+- [ ] **Docker Installed**: Install Docker on your remote server.
+- [ ] **Domain Name**: Associate your domain name with your remote server's IP address.
+- [ ] **SSL Certificate**: Obtain an SSL certificate for your domain.
 
 ## Deployment Steps
 
