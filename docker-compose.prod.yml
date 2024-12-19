@@ -29,9 +29,6 @@ services:
     image: kalebrs/imagecaption-frontend:latest
     env_file:
       - .env.prod
-    environment:
-      - ENV=dev
-      - BACKEND_URL=http://backend:8051
     depends_on:
       backend:
         condition: service_healthy
@@ -41,9 +38,9 @@ services:
       - app-network
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8501/healthz"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 30s
+      timeout: 10s
+      retries: 3
       start_period: 30s
     ports:
       - "8501:8501"
@@ -95,7 +92,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 2
       start_period: 10s
     networks:
       - app-network
@@ -113,7 +110,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 2
       start_period: 10s
     networks:
       - app-network

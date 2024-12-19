@@ -10,7 +10,33 @@ st.set_page_config(page_title="Inventive Image Caption", layout="wide")
 
 st.title("Inventive Image Caption")
 
-# Initialize session states
+st.write(
+    """
+    The following model is a light version of [BLIP](https://github.com/salesforce/BLIP) fine-tuned on the [Flickr30K dataset](https://huggingface.co/datasets/nlphuji/flickr30k), introduced in this [paper](https://shannon.cs.illinois.edu/DenotationGraph/TACLDenotationGraph.pdf). 
+    BLIP is a transformer-based model that uses a vision encoder and a text decoder, a variation of [Transformer](https://arxiv.org/abs/1706.03762), or ViT, architecture.
+    Training took a couple of hours on an [RTX A6000](https://www.runpod.io/pricing).
+""",
+    unsafe_allow_html=True,
+)
+
+with st.expander("How to Use", expanded=False):
+    st.write(
+        """
+    - Upload an image
+    - Hopefully, recieve a good caption
+    - If not, please provide feedback and an accurate caption
+    - These logs will be passed back to the model as <a href='https://huggingface.co/blog/rlhf' target='_blank'>reinforcement learning from human feedback (RLHF)</a>, improving the model performance with usage.
+    """,
+        unsafe_allow_html=True,
+    )
+
+st.info(
+    """
+    Feel free to take a look at the codebase [here](https://github.com/kalebsofer/DeployImageCaptioning).
+    """,
+    icon=":material/info:",
+)
+
 if "image_uploaded" not in st.session_state:
     st.session_state.image_uploaded = False
 if "caption" not in st.session_state:
@@ -22,7 +48,6 @@ if "image_id" not in st.session_state:
 if "uploaded_image" not in st.session_state:
     st.session_state.uploaded_image = None
 
-# Reset function to handle new uploads
 def reset_state():
     st.session_state.image_uploaded = False
     st.session_state.caption = None
