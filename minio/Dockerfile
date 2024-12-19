@@ -11,9 +11,8 @@ RUN wget https://dl.min.io/server/minio/release/linux-amd64/minio && \
 
 RUN pip install minio --no-cache-dir
 
-RUN useradd -r -u 1000 -g root minio
-
-RUN mkdir -p /model && \
+RUN useradd -r -u 1000 -g root minio && \
+    mkdir -p /model && \
     chown -R minio:root /model && \
     chmod -R u+rxw /model
 
@@ -24,12 +23,8 @@ COPY init_minio.py /usr/local/bin/
 RUN dos2unix /usr/local/bin/init.sh && \
     chmod +x /usr/local/bin/init.sh && \
     chmod +x /usr/local/bin/init_minio.py && \
-    chown -R minio:root /model && chmod -R u+rxw /model && \
     chown minio:root /usr/local/bin/init.sh && \
     chown minio:root /usr/local/bin/init_minio.py
-
-RUN ls -la /usr/local/bin/init.sh && \
-    ls -la /usr/local/bin/init_minio.py
 
 USER minio
 EXPOSE 9000 9001

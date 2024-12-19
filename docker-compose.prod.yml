@@ -1,37 +1,26 @@
 services:
-  nginx:
-    build:
-      context: ./nginx
-      dockerfile: Dockerfile
-    image: kalebrs/imagecaption-nginx:latest
-    env_file:
-      - .env.prod
+  traefik:
+    image: "traefik:v3.2.2"
+    command:
+      - "--log.level=DEBUG"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"
+      - "--certificatesresolvers.myresolver.acme.email=kalebsofer@gmail.com"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+      - "--api.dashboard=true"
     ports:
       - "80:80"
       - "443:443"
+      - "8080:8080"
     volumes:
-      - ./image_caption/nginx/conf.d:/etc/nginx/conf.d
-      - /etc/letsencrypt:/etc/letsencrypt:ro
+      - "letsencrypt:/letsencrypt"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - app-network
-    healthcheck:
-      test: |
-        CMD-SHELL
-        echo "Testing Frontend connection..." &&
-        curl -f http://ic_frontend:8501/_stcore/health &&
-        echo "Testing Backend connection..." &&
-        curl -f http://ic_backend:8051/health ||
-        exit 1
-      interval: 10s
-      timeout: 5s
-      retries: 3
-      start_period: 30s
-    depends_on:
-      frontend:
-        condition: service_healthy
-      backend:
-        condition: service_healthy
-
 
   frontend:
     build:
@@ -40,9 +29,6 @@ services:
     image: kalebrs/imagecaption-frontend:latest
     env_file:
       - .env.prod
-    environment:
-      - ENV=dev
-      - BACKEND_URL=http://backend:8051
     depends_on:
       backend:
         condition: service_healthy
@@ -51,13 +37,19 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "curl -v http://localhost:8501/_stcore/health || echo 'Health check failed' >&2"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "curl", "-f", "http://localhost:8501/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
       start_period: 30s
     ports:
       - "8501:8501"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`inventiveimagecaption.com`) || Host(`www.inventiveimagecaption.com`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=myresolver"
+      - "traefik.http.services.frontend.loadbalancer.server.port=8501"
 
   backend:
     build:
@@ -100,7 +92,7 @@ services:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 10s
       timeout: 10s
-      retries: 3
+      retries: 2
       start_period: 10s
     networks:
       - app-network
@@ -118,7 +110,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 2
       start_period: 10s
     networks:
       - app-network
@@ -146,10 +138,6 @@ networks:
 
 volumes:
   letsencrypt:
-  webroot:
   minio_data:
-    driver: local
   postgres_data:
-    driver: local
   pgadmin_data:
-    driver: local
