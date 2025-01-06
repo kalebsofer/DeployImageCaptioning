@@ -1,10 +1,10 @@
 # DeployImageCaptioning
 
-[simplesearchengine.com 🌐](https://www.simplesearchengine.com/)
+🌐 Frontend lives here: [inventiveimagecaption.com](https://www.inventiveimagecaption.com/)
 
 ## Overview
 
-DeployImageCaptioning is the deployment of [ImageCaptioning](https://github.com/kalebsofer/ImageCaptioning), a multi-modal transformer for image captioning. The service provides a simple interface to upload an image and receive and a generated caption, the model uses a similar architecture as described in [Attention is All You Need](https://arxiv.org/abs/1706.03762) .
+DeployImageCaptioning is the deployment of [ImageCaptioning](https://github.com/kalebsofer/ImageCaptioning), a multi-modal transformer for image captioning. The service provides a simple interface to upload an image and receive and a generated caption, the model uses a similar architecture as described in [Attention is All You Need](https://arxiv.org/abs/1706.03762) and is fine-tuned on [Flickr30K](https://huggingface.co/datasets/nlphuji/flickr30k).
 
 
 <div align="center">
