@@ -1,12 +1,11 @@
 # DeployImageCaptioning
 
-[Frontend lives here 🌐](http://37.27.222.64:8501/)
+[simplesearchengine.com 🌐](https://www.simplesearchengine.com/)
 
 ## Overview
 
-DeployImageCaptioning is the deployment of [ImageCaptioning](https://github.com/kalebsofer/ImageCaptioning), a multi-modal transformer for image captioning. The project is fully containerized, scalable, and modularised. It is deployed on a renter Hetzner server.
+DeployImageCaptioning is the deployment of [ImageCaptioning](https://github.com/kalebsofer/ImageCaptioning), a multi-modal transformer for image captioning. The service provides a simple interface to upload an image and receive and a generated caption, the model uses a similar architecture as described in [Attention is All You Need](https://arxiv.org/abs/1706.03762) .
 
-The transformer architecture follows a similar design to the [Attention is All You Need](https://arxiv.org/abs/1706.03762) paper.
 
 <div align="center">
   <img src="public/images/transformer.png" alt="transformer" width="50%"/>
@@ -15,13 +14,13 @@ The transformer architecture follows a similar design to the [Attention is All Y
 
 ## Container Architecture
 
-The architecture is modular and scalable. Docker containers have a single purpose and are designed to be stateless.
+The project is modular and fully containerized, containers have a single purpose and are designed to be stateless. The project is deployed on a small server I rent from Hetzner.
 
-- **Frontend**: Hosted using a Streamlit server, accessible at [http://65.109.142.90:8501/](http://65.109.142.90:8501/).
+- **Frontend**: Hosted using a Streamlit server.
 - **Backend**: Retrieves the model and performs inference on incoming audio transcription requests.
 - **Storage**: MinIO is used to store different versions of the transcription model.
-- **RDBS**: PostgreSQL is utilized to log user behavior and interactions.
-- **Traffic**: Nginx is configured to handle traffic and SSL termination.
+- **RDBS**: PostgreSQL is utilized to log user behavior.
+- **Traffic**: Traefik is configured to handle traffic and SSL termination.
 - **Reinforcement**: Spins up on a schedule, uses PostgreSQL logs for reinforcement, updates the model weights, and pushes the latest version to MinIO.
 
 ![Container Architecture](public/images/container_architecture.png)

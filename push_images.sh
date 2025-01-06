@@ -4,7 +4,6 @@ DOCKER_HUB_USERNAME="kalebrs"
 
 images=(
   "imagecaption-frontend"
-  "imagecaption-nginx"
   "imagecaption-postgres"
   "imagecaption-backend"
   "imagecaption-minio"
